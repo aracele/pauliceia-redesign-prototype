@@ -1,0 +1,1 @@
+{"version":2,"buildCommand":"npm run build","outputDirectory":"dist","installCommand":"npm install","rewrites":[{"source":"/portal/:path*","destination":"/index.html"},{"source":"/:path*","destination":"/index.html"}]}
