@@ -13,6 +13,7 @@ import "./footer-figma.css";
 import "./footer-hard-reset.css";
 import "./sidebar-width.css";
 import "./mobile-responsive.css";
+import "./mobile-right-drawer.css";
 import App from "./App";
 
 createRoot(document.getElementById("root") as HTMLElement).render(<React.StrictMode><App /></React.StrictMode>);
