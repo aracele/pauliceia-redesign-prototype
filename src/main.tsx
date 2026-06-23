@@ -6,6 +6,7 @@ import "./layout.css";
 import "./login.css";
 import "./home.css";
 import "./map.css";
+import "./figma-overrides.css";
 import App from "./App";
 
 createRoot(document.getElementById("root") as HTMLElement).render(<React.StrictMode><App /></React.StrictMode>);
