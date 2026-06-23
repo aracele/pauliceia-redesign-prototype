@@ -3,7 +3,35 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Switch from "@radix-ui/react-switch";
 import * as Tabs from "@radix-ui/react-tabs";
 import L from "leaflet";
-import { BookOpen, ChevronLeft, ChevronRight, Clock3, Download, Eye, EyeOff, Github, Globe2, Heart, HelpCircle, Home, Info, Layers3, ListFilter, LogIn, Mail, Map, MapPin, Search, Share2, Upload, User, X, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Download,
+  Eye,
+  EyeOff,
+  Github,
+  Globe2,
+  Heart,
+  HelpCircle,
+  Home,
+  Info,
+  Layers3,
+  ListFilter,
+  LogIn,
+  Mail,
+  Map,
+  MapPin,
+  Search,
+  Share2,
+  Upload,
+  User,
+  Users,
+  X,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 
 const logoWithLabel = "https://www.figma.com/api/mcp/asset/95d7d717-05de-4815-a7ee-9f92474855aa";
 const loginImage = "https://www.figma.com/api/mcp/asset/a1d7a84a-4e7d-47ee-b99d-09e984a9c46d";
@@ -11,30 +39,228 @@ const heroHome = "https://www.figma.com/api/mcp/asset/2a1c66bd-bd64-4a9a-9425-2e
 
 type Page = "login" | "home" | "map";
 type ModalType = "register" | "recover" | "filters" | "upload" | "layer" | "help" | null;
-type Layer = { id: string; title: string; author: string; tags: string[]; color: string; active: boolean; favorite: boolean; points: [number, number][] };
+type Layer = {
+  id: string;
+  title: string;
+  author: string;
+  tags: string[];
+  color: string;
+  active: boolean;
+  favorite: boolean;
+  points: [number, number][];
+};
 
 const layersSeed: Layer[] = [
-  { id: "enchente1850", title: "A enchente de 1850", author: "Orlando Guarnieri", tags: ["enchente", "anhangabau"], color: "#2563eb", active: false, favorite: false, points: [[-23.545, -46.638], [-23.55, -46.645]] },
+  { id: "enchente1850", title: "A enchente de 1850", author: "Orlando Guarnieri", tags: ["enchente", "anhangabau"], color: "#2563eb", active: true, favorite: false, points: [[-23.545, -46.638], [-23.55, -46.645]] },
   { id: "enchente1929", title: "A enchente de 1929 em SP", author: "Luis A. C. Ferla", tags: ["enchente", "história ambiental"], color: "#16a34a", active: true, favorite: false, points: [[-23.548, -46.633], [-23.552, -46.629], [-23.543, -46.624]] },
   { id: "esgotos1893", title: "Área servida de esgotos até 1893", author: "Orlando Guarnieri", tags: ["esgoto", "cantareira"], color: "#dc2626", active: true, favorite: false, points: [[-23.541, -46.636], [-23.546, -46.628]] },
   { id: "homossexuais1939", title: "Áreas ocupadas por homossexuais 1939 a 1959", author: "Cintia Almeida", tags: ["resistência", "homossexuais"], color: "#9333ea", active: false, favorite: false, points: [[-23.556, -46.642]] },
   { id: "escolas1892", title: "Anuário de escolas até 1892", author: "Cintia Almeida", tags: ["educação", "institucional"], color: "#0891b2", active: false, favorite: false, points: [[-23.544, -46.651], [-23.557, -46.631]] },
 ];
-const baseMaps = ["OpenStreetMap", "São Paulo 1930", "São Paulo 1924", "São Paulo 1905", "São Paulo 1890", "São Paulo 1881", "São Paulo 1877", "São Paulo 1868"];
-function cn(...c: Array<string | false | null | undefined>) { return c.filter(Boolean).join(" "); }
-function initialPage(): Page { return location.pathname.includes("login") ? "login" : location.pathname.includes("explore") ? "map" : "home"; }
-function Button({ children, variant = "primary", size = "md", className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "outline" | "ghost"; size?: "sm" | "md" | "lg" | "icon" }) { return <button className={cn("btn", `btn-${variant}`, `btn-${size}`, className)} {...props}>{children}</button>; }
-function Logo({ large = false }: { large?: boolean }) { return <img className={cn("logo", large && "logo-large")} src={logoWithLabel} alt="Pauliceia 2.0" />; }
 
-function Header({ page, go, open, lang, setLang }: { page: Page; go: (p: Page) => void; open: (m: ModalType) => void; lang: string; setLang: (v: string) => void }) {
-  return <header className="topbar"><button className="brand" onClick={() => go("home")}><Logo /></button><nav><button className={page === "home" ? "active" : ""} onClick={() => go("home")}><Home size={16}/>Início</button><button className={page === "map" ? "active" : ""} onClick={() => go("map")}><Map size={16}/>Mapa</button><button onClick={() => open("help")}><HelpCircle size={16}/>Sobre</button><button onClick={() => open("help")}><BookOpen size={16}/>Tutorial</button><button onClick={() => open("help")}><Mail size={16}/>Contato</button></nav><div className="top-actions"><div className="language"><button className={lang === "PT" ? "active" : ""} onClick={() => setLang("PT")}><Globe2 size={14}/>PT</button><button className={lang === "EN" ? "active" : ""} onClick={() => setLang("EN")}><Globe2 size={14}/>EN</button></div>{page === "map" && <><Button variant="ghost" size="icon"><Share2 size={18}/></Button><Button variant="ghost" size="icon"><Download size={18}/></Button></>}<Button variant="secondary" size="sm" onClick={() => go("login")}><LogIn size={16}/>Entrar</Button><Button variant="outline" size="sm" onClick={() => open("register")}><User size={16}/>Cadastrar-se</Button></div></header>;
+const baseMaps = ["OpenStreetMap", "São Paulo 1930", "São Paulo 1924", "São Paulo 1905", "São Paulo 1890", "São Paulo 1881", "São Paulo 1877", "São Paulo 1868"];
+
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
 }
 
-function LoginPage({ go, open, toast }: { go: (p: Page) => void; open: (m: ModalType) => void; toast: (m: string) => void }) { const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [show,setShow]=useState(false); const [remember,setRemember]=useState(false); const [err,setErr]=useState(false); const submit=()=>{ if(!email||!password){setErr(true);return;} go("home"); }; return <section className="login-page"><div className="login-left"><div className="login-card"><Logo large/><div className="login-title"><h1>Boas-vindas ao Pauliceia!</h1><p>Entre com sua conta para continuar</p></div><form onSubmit={(e)=>{e.preventDefault();submit();}}><label className="field"><span>E-mail</span><input className={err?"error":""} value={email} onChange={(e)=>{setEmail(e.target.value);setErr(false);}} placeholder="seu@email.com"/></label><label className="field"><span>Senha</span><div className="password"><input className={err?"error":""} value={password} onChange={(e)=>{setPassword(e.target.value);setErr(false);}} type={show?"text":"password"} placeholder="Digite sua senha"/><button type="button" onClick={()=>setShow(!show)}>{show?<EyeOff size={17}/>:<Eye size={17}/>}</button></div></label>{err&&<p className="form-error">Informe seu e-mail e senha para continuar.</p>}<div className="login-options"><label><input checked={remember} onChange={(e)=>setRemember(e.target.checked)} type="checkbox"/><span/>Lembrar de mim</label><button type="button" onClick={()=>open("recover")}>Esqueceu a senha?</button></div><Button size="lg" className="full"><LogIn size={18}/>Entrar</Button></form><div className="sep"><span>ou continue com</span></div><div className="social"><Button variant="outline" onClick={()=>toast("Login social indisponível no protótipo")}><b>G</b>Google</Button><Button variant="outline" onClick={()=>toast("Login social indisponível no protótipo")}><Github size={18}/>GitHub</Button></div><p className="signup">Não tem uma conta? <button onClick={()=>open("register")}>Criar conta</button></p></div></div><div className="login-image" style={{backgroundImage:`linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.58)),url(${loginImage})`}}><div><p><MapPin size={24}/>São Paulo Histórica</p><h2>Explore a história de São Paulo através dos mapas</h2><span>Descubra como a cidade evoluiu entre 1870 e 1940 com mapas históricos georreferenciados.</span></div></div></section>; }
+function initialPage(): Page {
+  return location.pathname.includes("login") ? "login" : location.pathname.includes("explore") ? "map" : "home";
+}
 
-function HomePage({ go, open, lang, setLang }: { go: (p: Page) => void; open: (m: ModalType) => void; lang: string; setLang: (v: string) => void }) { const cards = [[Map,"Mapas históricos","Explore mapas detalhados de São Paulo entre 1870 e 1940, com sobreposição de camadas cartográficas."],[Clock3,"Navegação temporal","Use o slider temporal para viajar no tempo e ver as transformações urbanas década a década."],[Search,"Busca de endereços","Pesquise endereços históricos por nome de rua, número e ano, ou faça upload de listas em CSV."],[Layers3,"Camadas colaborativas","Crie e compartilhe camadas de dados geográficos com a comunidade de pesquisadores."],[Upload,"Upload de dados","Importe seus dados de pesquisa em CSV e visualize-os no mapa."],[Download,"Exportação","Baixe dados, imagens e resultados de análise para documentação."]] as const; return <section><Header page="home" go={go} open={open} lang={lang} setLang={setLang}/><section className="hero" style={{backgroundImage:`linear-gradient(90deg,rgba(0,0,0,.74),rgba(0,0,0,.36)),url(${heroHome})`}}><div><span><MapPin size={15}/>Plataforma de mapeamento histórico</span><h1>Explore a história de <em>São Paulo</em> através dos mapas</h1><p>Uma plataforma colaborativa para pesquisadores, estudantes e curiosos explorarem a transformação urbana de São Paulo entre 1870 e 1940.</p><div><Button size="lg" onClick={()=>go("map")}><Map size={19}/>Explorar o mapa</Button><Button variant="secondary" size="lg"><Search size={19}/>Saiba mais sobre o projeto</Button></div></div></section><section className="metrics"><article><b>50+</b><span>Mapas históricos</span></article><article><b>200+</b><span>Camadas de dados</span></article><article><b>1.200+</b><span>Pesquisadores</span></article><article><b>70</b><span>Anos cobertos</span></article></section><section className="tools"><div className="section-title"><h2>Ferramentas para sua <em>pesquisa</em></h2><p>Ferramentas poderosas para pesquisa histórica e análise geoespacial.</p></div><div className="tool-grid">{cards.map(([Icon,title,text])=><article key={title} className="tool-card"><div><Icon size={24}/></div><h3>{title}</h3><p>{text}</p></article>)}</div></section><footer><div><Logo/><p>Plataforma colaborativa de mapeamento histórico de São Paulo.</p></div><nav><b>Links rápidos</b><button onClick={()=>go("map")}>Explorar Mapa</button><button onClick={()=>open("help")}>Sobre o Projeto</button><button onClick={()=>go("login")}>Entrar</button></nav><nav><b>Recursos</b><button>Tutorial</button><button>Documentação</button><button>API</button></nav><nav><b>Contato</b><p>contato@pauliceia.org</p><p>Universidade Federal de São Paulo</p></nav></footer></section>; }
+function Button({ children, variant = "primary", size = "md", className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "outline" | "ghost"; size?: "sm" | "md" | "lg" | "icon" }) {
+  return <button className={cn("btn", `btn-${variant}`, `btn-${size}`, className)} {...props}>{children}</button>;
+}
 
-function LeafletMap({ layers, marker }: { layers: Layer[]; marker: boolean }) { const el=useRef<HTMLDivElement|null>(null); const map=useRef<L.Map|null>(null); const group=useRef<L.LayerGroup|null>(null); useEffect(()=>{ if(!el.current||map.current)return; const m=L.map(el.current,{zoomControl:false}).setView([-23.5489,-46.6388],14); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(m); group.current=L.layerGroup().addTo(m); map.current=m; setTimeout(()=>m.invalidateSize(),120); return()=>{m.remove();map.current=null};},[]); useEffect(()=>{ const g=group.current; if(!g)return; g.clearLayers(); layers.filter(l=>l.active).forEach(l=>l.points.forEach(([lat,lng])=>L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:3,fillColor:l.color,fillOpacity:1}).bindTooltip(l.title).addTo(g))); if(marker)L.marker([-23.5467,-46.6388],{icon:L.divIcon({className:"found-icon",html:"<span>Endereço encontrado</span>"})}).addTo(g);},[layers,marker]); return <div className="leaflet-map" ref={el}/>; }
-function MapPage({ go, open, lang, setLang, toast, selectLayer }: { go:(p:Page)=>void; open:(m:ModalType)=>void; lang:string; setLang:(v:string)=>void; toast:(m:string)=>void; selectLayer:(l:Layer|null)=>void }) { const [tab,setTab]=useState("layers"); const [layers,setLayers]=useState(layersSeed); const [query,setQuery]=useState(""); const [mapQuery,setMapQuery]=useState(""); const [address,setAddress]=useState(""); const [marker,setMarker]=useState(false); const [collapsed,setCollapsed]=useState(false); const toggle=(id:string)=>setLayers(p=>p.map(l=>l.id===id?{...l,active:!l.active}:l)); const fav=(id:string)=>setLayers(p=>p.map(l=>l.id===id?{...l,favorite:!l.favorite}:l)); const filtered=layers.filter(l=>[l.title,l.author,...l.tags].join(" ").toLowerCase().includes(query.toLowerCase())); const search=()=>{ if(!address.trim()){toast("Digite um endereço para buscar");return;} setMarker(true);toast("Endereço encontrado");}; return <section className="map-page"><Header page="map" go={go} open={open} lang={lang} setLang={setLang}/><div className={cn("map-shell",collapsed&&"collapsed")}><aside className="sidebar"><Tabs.Root value={tab} onValueChange={setTab}><Tabs.List className="tabs"><Tabs.Trigger value="maps"><Map size={17}/>Mapas</Tabs.Trigger><Tabs.Trigger value="layers"><Layers3 size={17}/>Camadas</Tabs.Trigger></Tabs.List></Tabs.Root>{tab==="layers"?<><div className="side-title"><div><h2>Camadas de dados</h2><p>{filtered.length} camadas encontradas</p></div><Button variant="ghost" size="sm" onClick={()=>open("filters")}><ListFilter size={16}/>Filtrar</Button></div><label className="search-field"><Search size={18}/><input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Pesquisar camadas"/></label><div className="cards">{filtered.map(l=><article className={cn("layer-card",l.active&&"selected")} key={l.id}><div className="layer-main"><span style={{background:l.color}}/><div><h3>{l.title}</h3><p>{l.author}</p></div><Switch.Root className="switch" checked={l.active} onCheckedChange={()=>toggle(l.id)}><Switch.Thumb className="switch-thumb"/></Switch.Root></div><div className="badges">{l.tags.map(t=><span key={t}>{t}</span>)}</div><div className="card-actions"><button className={l.favorite?"active":""} onClick={()=>fav(l.id)}><Heart size={16}/>Favoritar</button><button onClick={()=>{selectLayer(l);open("layer")}}><Info size={16}/>Detalhes</button></div></article>)}</div></>:<><div className="side-title"><div><h2>Mapas base</h2><p>Selecione um mapa histórico</p></div></div><label className="search-field"><Search size={18}/><input value={mapQuery} onChange={(e)=>setMapQuery(e.target.value)} placeholder="Pesquisar mapas"/></label><div className="cards">{baseMaps.filter(m=>m.toLowerCase().includes(mapQuery.toLowerCase())).map((m,i)=><article className={cn("base-card",i===0&&"selected")} key={m}><div><h3>{m}</h3><p>{i===0?"Mapa base atual":"Mapa histórico georreferenciado"}</p></div><Switch.Root className="switch" checked={i===0}><Switch.Thumb className="switch-thumb"/></Switch.Root></article>)}</div></>}</aside><button className="collapse" onClick={()=>setCollapsed(!collapsed)}>{collapsed?<ChevronRight/>:<ChevronLeft/>}</button><main className="map-area"><LeafletMap layers={layers} marker={marker}/><div className="map-search"><label><Search size={20}/><input value={address} onChange={(e)=>setAddress(e.target.value)} onKeyDown={(e)=>e.key==="Enter"&&search()} placeholder="Buscar endereço: rua, número, ano"/></label><Button size="icon" onClick={search}><Search/></Button><Button variant="secondary" size="icon" onClick={()=>open("upload")}><Upload/></Button></div><aside className="legend"><h3>Legenda</h3><p><span className="o"/>Encontrado</p><p><span className="b"/>Geocodificado</p><p><span className="y"/>Extrapolado</p></aside><div className="zoom"><Button variant="secondary" size="icon"><ZoomIn/></Button><Button variant="secondary" size="icon"><ZoomOut/></Button><Button variant="secondary" size="icon"><MapPin/></Button></div><div className="timeline"><Clock3 size={22}/><input defaultValue={1868} type="number"/><input defaultValue={1868} type="range" min="1868" max="1940"/><input defaultValue={1940} type="range" min="1868" max="1940"/><input defaultValue={1940} type="number"/><b>1868–1940</b></div></main></div></section>; }
-function Modal({ modal, setModal, selected, toast }: { modal: ModalType; setModal:(m:ModalType)=>void; selected:Layer|null; toast:(m:string)=>void }) { const title=modal==="register"?"Criar conta":modal==="recover"?"Recuperar senha":modal==="filters"?"Filtrar camadas":modal==="upload"?"Enviar lista de endereços":modal==="layer"?selected?.title:"Ajuda"; return <Dialog.Root open={!!modal} onOpenChange={o=>!o&&setModal(null)}><Dialog.Portal><Dialog.Overlay className="overlay"/><Dialog.Content className="dialog"><Dialog.Close className="close"><X/></Dialog.Close><Dialog.Title>{title}</Dialog.Title>{modal==="layer"&&selected?<><p><b>Autor:</b> {selected.author}</p><p>Camada histórica georreferenciada para análise espacial no Pauliceia 2.0.</p><div className="badges">{selected.tags.map(t=><span key={t}>{t}</span>)}</div></>:modal==="upload"?<><p>Formatos aceitos: CSV.</p><div className="drop"><Upload/><b>Arraste seu arquivo aqui</b><span>ou clique para selecionar</span></div></>:<><p>Interação simulada para o protótipo navegável.</p><label className="field"><span>E-mail</span><input placeholder="seu@email.com"/></label></>}<div className="dialog-actions"><Button variant="outline" onClick={()=>setModal(null)}>Fechar</Button><Button onClick={()=>{toast("Ação concluída");setModal(null)}}>Confirmar</Button></div></Dialog.Content></Dialog.Portal></Dialog.Root>; }
-export default function App(){ const [page,setPageState]=useState<Page>(initialPage()); const [modal,setModal]=useState<ModalType>(null); const [lang,setLang]=useState("PT"); const [toast,setToast]=useState(""); const [selected,setSelected]=useState<Layer|null>(null); const go=(p:Page)=>{setPageState(p);history.pushState(null,"",p==="login"?"/portal/login":p==="map"?"/portal/explore":"/portal/home")}; const say=(m:string)=>{setToast(m);setTimeout(()=>setToast(""),2200)}; return <><main>{page==="login"&&<LoginPage go={go} open={setModal} toast={say}/>} {page==="home"&&<HomePage go={go} open={setModal} lang={lang} setLang={setLang}/>} {page==="map"&&<MapPage go={go} open={setModal} lang={lang} setLang={setLang} toast={say} selectLayer={setSelected}/>}</main><Modal modal={modal} setModal={setModal} selected={selected} toast={say}/>{toast&&<div className="toast">{toast}</div>}</>}
+function Logo({ large = false }: { large?: boolean }) {
+  return <img className={cn("logo", large && "logo-large")} src={logoWithLabel} alt="Pauliceia 2.0" />;
+}
+
+function Header({ page, go, open, lang, setLang }: { page: Page; go: (p: Page) => void; open: (m: ModalType) => void; lang: string; setLang: (v: string) => void }) {
+  return (
+    <header className="topbar">
+      <button className="brand" onClick={() => go("home")}><Logo /></button>
+      <nav>
+        <button className={page === "home" ? "active" : ""} onClick={() => go("home")}><Home size={16}/>Início</button>
+        <button className={page === "map" ? "active" : ""} onClick={() => go("map")}><Map size={16}/>Mapa</button>
+        <button onClick={() => open("help")}><HelpCircle size={16}/>Sobre</button>
+        <button onClick={() => open("help")}><BookOpen size={16}/>Tutorial</button>
+        <button onClick={() => open("help")}><Mail size={16}/>Contato</button>
+      </nav>
+      <div className="top-actions">
+        <div className="language">
+          <button className={lang === "PT" ? "active" : ""} onClick={() => setLang("PT")}><Globe2 size={14}/>PT</button>
+          <button className={lang === "EN" ? "active" : ""} onClick={() => setLang("EN")}><Globe2 size={14}/>EN</button>
+        </div>
+        {page === "map" && <><Button variant="ghost" size="icon"><Share2 size={18}/></Button><Button variant="ghost" size="icon"><Download size={18}/></Button></>}
+        <Button variant="secondary" size="sm" onClick={() => go("login")}><LogIn size={16}/>Entrar</Button>
+        <Button variant="outline" size="sm" onClick={() => open("register")}><User size={16}/>Cadastrar-se</Button>
+      </div>
+    </header>
+  );
+}
+
+function LoginPage({ go, open, toast }: { go: (p: Page) => void; open: (m: ModalType) => void; toast: (m: string) => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [err, setErr] = useState(false);
+  const submit = () => {
+    if (!email || !password) { setErr(true); return; }
+    go("home");
+  };
+  return (
+    <section className="login-page">
+      <div className="login-left">
+        <div className="login-card">
+          <Logo large />
+          <div className="login-title"><h1>Boas-vindas ao Pauliceia!</h1><p>Entre com sua conta para continuar</p></div>
+          <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
+            <label className="field"><span>E-mail</span><input className={err ? "error" : ""} value={email} onChange={(e) => { setEmail(e.target.value); setErr(false); }} placeholder="seu@email.com" /></label>
+            <label className="field"><span>Senha</span><div className="password"><input className={err ? "error" : ""} value={password} onChange={(e) => { setPassword(e.target.value); setErr(false); }} type={show ? "text" : "password"} placeholder="Digite sua senha" /><button type="button" onClick={() => setShow(!show)}>{show ? <EyeOff size={17}/> : <Eye size={17}/>}</button></div></label>
+            {err && <p className="form-error">Informe seu e-mail e senha para continuar.</p>}
+            <div className="login-options"><label><input checked={remember} onChange={(e) => setRemember(e.target.checked)} type="checkbox"/><span/>Lembrar de mim</label><button type="button" onClick={() => open("recover")}>Esqueceu a senha?</button></div>
+            <Button size="lg" className="full"><LogIn size={18}/>Entrar</Button>
+          </form>
+          <div className="sep"><span>ou continue com</span></div>
+          <div className="social"><Button variant="outline" onClick={() => toast("Login social indisponível no protótipo")}><b>G</b>Google</Button><Button variant="outline" onClick={() => toast("Login social indisponível no protótipo")}><Github size={18}/>GitHub</Button></div>
+          <p className="signup">Não tem uma conta? <button onClick={() => open("register")}>Criar conta</button></p>
+        </div>
+      </div>
+      <div className="login-image" style={{ backgroundImage: `linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.58)),url(${loginImage})` }}>
+        <div><p><MapPin size={24}/>São Paulo Histórica</p><h2>Explore a história de São Paulo através dos mapas</h2><span>Descubra como a cidade evoluiu entre 1870 e 1940 com mapas históricos georreferenciados.</span></div>
+      </div>
+    </section>
+  );
+}
+
+function Footer({ go, open }: { go: (p: Page) => void; open: (m: ModalType) => void }) {
+  return (
+    <footer className="site-footer">
+      <div className="footer-main">
+        <section className="footer-brand"><Logo /><p>Plataforma colaborativa de mapeamento histórico de São Paulo (1870-1940)</p><div className="footer-social"><span>↗</span><span>𝕏</span><span>◎</span><span>⚑</span></div></section>
+        <nav><b>Links rápidos</b><button onClick={() => go("map")}>Explorar Mapa</button><button onClick={() => open("help")}>Sobre o Projeto</button><button onClick={() => open("help")}>Contato</button><button onClick={() => go("login")}>Entrar</button></nav>
+        <nav><b>Recursos</b><button>Documentação</button><button>API</button><button>Tutorial</button><button>FAQ</button></nav>
+        <nav><b>Contato</b><p><Mail size={14}/>contato@pauliceia.org</p><p><MapPin size={14}/><span>Universidade Federal de São Paulo<br/>Guarulhos, SP</span></p></nav>
+      </div>
+      <div className="footer-bottom"><span>© 2026 Pauliceia 2.0. Todos os direitos reservados.</span><div><button>Termos de Uso</button><button>Privacidade</button><button>Licença</button></div></div>
+    </footer>
+  );
+}
+
+function HomePage({ go, open, lang, setLang }: { go: (p: Page) => void; open: (m: ModalType) => void; lang: string; setLang: (v: string) => void }) {
+  const cards = [
+    [Map, "Mapas históricos", "Explore mapas detalhados de São Paulo entre 1870 e 1940, com sobreposição de camadas cartográficas."],
+    [Clock3, "Navegação temporal", "Use o slider temporal para viajar no tempo e ver as transformações urbanas década a década."],
+    [Search, "Busca de endereços", "Pesquise endereços históricos por nome de rua, número e ano, ou faça upload de listas em CSV."],
+    [Layers3, "Camadas colaborativas", "Crie e compartilhe camadas de dados geográficos com a comunidade de pesquisadores."],
+    [Upload, "Upload de dados", "Importe seus dados de pesquisa em formatos CSV ou Shapefile e visualize-os no mapa."],
+    [Users, "Comunidade acadêmica", "Conecte-se com pesquisadores, acompanhe contribuições e colabore em projetos históricos."],
+  ] as const;
+  return (
+    <section>
+      <Header page="home" go={go} open={open} lang={lang} setLang={setLang}/>
+      <section className="hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(0,0,0,.74),rgba(0,0,0,.36)),url(${heroHome})` }}><div><span><MapPin size={15}/>Plataforma de mapeamento histórico</span><h1>Explore a história de <em>São Paulo</em> através dos mapas</h1><p>Uma plataforma colaborativa para pesquisadores, estudantes e curiosos explorarem a transformação urbana de São Paulo entre 1870 e 1940.</p><div><Button size="lg" onClick={() => go("map")}><Map size={19}/>Explorar o mapa</Button><Button variant="secondary" size="lg"><Search size={19}/>Saiba mais sobre o projeto</Button></div></div></section>
+      <section className="metrics"><article><b>50+</b><span>Mapas históricos</span></article><article><b>200+</b><span>Camadas de dados</span></article><article><b>1.200+</b><span>Pesquisadores</span></article><article><b>70</b><span>Anos cobertos</span></article></section>
+      <section className="tools"><div className="section-title"><h2>Ferramentas para sua <em>pesquisa</em></h2><p>Ferramentas poderosas para pesquisa histórica e análise geoespacial</p></div><div className="tool-grid">{cards.map(([Icon, title, text]) => <article key={title} className="tool-card"><div><Icon size={24}/></div><h3>{title}</h3><p>{text}</p></article>)}</div></section>
+      <Footer go={go} open={open}/>
+    </section>
+  );
+}
+
+function LeafletMap({ layers, marker, collapsed }: { layers: Layer[]; marker: boolean; collapsed: boolean }) {
+  const el = useRef<HTMLDivElement | null>(null);
+  const map = useRef<L.Map | null>(null);
+  const group = useRef<L.LayerGroup | null>(null);
+
+  const invalidate = () => {
+    if (!map.current) return;
+    map.current.invalidateSize({ pan: false });
+  };
+
+  useEffect(() => {
+    if (!el.current || map.current) return;
+    const m = L.map(el.current, { zoomControl: false }).setView([-23.5489, -46.6388], 14);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" }).addTo(m);
+    group.current = L.layerGroup().addTo(m);
+    map.current = m;
+    setTimeout(invalidate, 120);
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(invalidate);
+      setTimeout(invalidate, 180);
+    });
+    observer.observe(el.current);
+    return () => { observer.disconnect(); m.remove(); map.current = null; };
+  }, []);
+
+  useEffect(() => {
+    setTimeout(invalidate, 0);
+    setTimeout(invalidate, 180);
+    setTimeout(invalidate, 360);
+  }, [collapsed]);
+
+  useEffect(() => {
+    const g = group.current;
+    if (!g) return;
+    g.clearLayers();
+    layers.filter((l) => l.active).forEach((l) => l.points.forEach(([lat, lng]) => L.circleMarker([lat, lng], { radius: 8, color: "#fff", weight: 3, fillColor: l.color, fillOpacity: 1 }).bindTooltip(l.title).addTo(g)));
+    if (marker) L.marker([-23.5467, -46.6388], { icon: L.divIcon({ className: "found-icon", html: "<span>Endereço encontrado</span>" }) }).addTo(g);
+  }, [layers, marker]);
+
+  return <div className="leaflet-map" ref={el}/>;
+}
+
+function MapPage({ go, open, lang, setLang, toast, selectLayer }: { go: (p: Page) => void; open: (m: ModalType) => void; lang: string; setLang: (v: string) => void; toast: (m: string) => void; selectLayer: (l: Layer | null) => void }) {
+  const [tab, setTab] = useState("layers");
+  const [layers, setLayers] = useState(layersSeed);
+  const [query, setQuery] = useState("");
+  const [mapQuery, setMapQuery] = useState("");
+  const [address, setAddress] = useState("");
+  const [marker, setMarker] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const toggle = (id: string) => setLayers((p) => p.map((l) => l.id === id ? { ...l, active: !l.active } : l));
+  const fav = (id: string) => setLayers((p) => p.map((l) => l.id === id ? { ...l, favorite: !l.favorite } : l));
+  const filtered = layers.filter((l) => [l.title, l.author, ...l.tags].join(" ").toLowerCase().includes(query.toLowerCase()));
+  const search = () => { if (!address.trim()) { toast("Digite um endereço para buscar"); return; } setMarker(true); toast("Endereço encontrado"); };
+
+  return (
+    <section className="map-page">
+      <Header page="map" go={go} open={open} lang={lang} setLang={setLang}/>
+      <div className={cn("map-shell", collapsed && "collapsed")}>
+        <aside className="sidebar">
+          <Tabs.Root value={tab} onValueChange={setTab}><Tabs.List className="tabs"><Tabs.Trigger value="maps"><Map size={17}/>Mapas</Tabs.Trigger><Tabs.Trigger value="layers"><Layers3 size={17}/>Camadas</Tabs.Trigger></Tabs.List></Tabs.Root>
+          {tab === "layers" ? <><div className="side-title"><div><h2>Camadas de dados (50)</h2><p>{filtered.length} camadas encontradas</p></div><Button variant="ghost" size="sm" onClick={() => open("filters")}><ListFilter size={16}/>Filtrar</Button></div><label className="search-field"><Search size={18}/><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Pesquisar camadas"/></label><div className="cards">{filtered.map((l) => <article className={cn("layer-card", l.active && "selected")} key={l.id}><div className="layer-main"><span style={{ background: l.color }}/><div><h3>{l.title}</h3><p>{l.author}</p></div><Switch.Root className="switch" checked={l.active} onCheckedChange={() => toggle(l.id)}><Switch.Thumb className="switch-thumb"/></Switch.Root></div><div className="badges">{l.tags.map((t) => <span key={t}>{t}</span>)}</div><div className="card-actions"><button className={l.favorite ? "active" : ""} onClick={() => fav(l.id)}><Heart size={16}/>Favoritar</button><button onClick={() => { selectLayer(l); open("layer"); }}><Info size={16}/>Detalhes</button></div></article>)}</div></> : <><div className="side-title"><div><h2>Mapas base</h2><p>Selecione um mapa histórico</p></div></div><label className="search-field"><Search size={18}/><input value={mapQuery} onChange={(e) => setMapQuery(e.target.value)} placeholder="Pesquisar mapas"/></label><div className="cards">{baseMaps.filter((m) => m.toLowerCase().includes(mapQuery.toLowerCase())).map((m, i) => <article className={cn("base-card", i === 0 && "selected")} key={m}><div><h3>{m}</h3><p>{i === 0 ? "Mapa base atual" : "Mapa histórico georreferenciado"}</p></div><Switch.Root className="switch" checked={i === 0}><Switch.Thumb className="switch-thumb"/></Switch.Root></article>)}</div></>}
+        </aside>
+        <button className="collapse" type="button" aria-label={collapsed ? "Mostrar barra lateral" : "Ocultar barra lateral"} onClick={() => setCollapsed(!collapsed)}>{collapsed ? <ChevronRight/> : <ChevronLeft/>}</button>
+        <main className="map-area">
+          <LeafletMap layers={layers} marker={marker} collapsed={collapsed}/>
+          <div className="map-search"><label><Search size={20}/><input value={address} onChange={(e) => setAddress(e.target.value)} onKeyDown={(e) => e.key === "Enter" && search()} placeholder="Buscar endereço: rua, número, ano"/></label><Button size="icon" onClick={search}><Search/></Button><Button variant="secondary" size="icon" onClick={() => open("upload")}><Upload/></Button></div>
+          <aside className="legend"><h3>Legenda</h3><p><span className="o"/>Encontrado</p><p><span className="b"/>Geocodificado</p><p><span className="y"/>Extrapolado</p></aside>
+          <div className="zoom"><Button variant="secondary" size="icon"><ZoomIn/></Button><Button variant="secondary" size="icon"><ZoomOut/></Button><Button variant="secondary" size="icon"><MapPin/></Button></div>
+          <div className="timeline"><Clock3 size={22}/><input defaultValue={1868} type="number"/><input defaultValue={1868} type="range" min="1868" max="1940"/><input defaultValue={1940} type="range" min="1868" max="1940"/><input defaultValue={1940} type="number"/><b>1868–1940</b></div>
+        </main>
+      </div>
+    </section>
+  );
+}
+
+function Modal({ modal, setModal, selected, toast }: { modal: ModalType; setModal: (m: ModalType) => void; selected: Layer | null; toast: (m: string) => void }) {
+  const title = modal === "register" ? "Criar conta" : modal === "recover" ? "Recuperar senha" : modal === "filters" ? "Filtrar camadas" : modal === "upload" ? "Enviar lista de endereços" : modal === "layer" ? selected?.title : "Ajuda";
+  return (
+    <Dialog.Root open={!!modal} onOpenChange={(o) => !o && setModal(null)}>
+      <Dialog.Portal><Dialog.Overlay className="overlay"/><Dialog.Content className="dialog"><Dialog.Close className="close"><X/></Dialog.Close><Dialog.Title>{title}</Dialog.Title>{modal === "layer" && selected ? <><p><b>Autor:</b> {selected.author}</p><p>Camada histórica georreferenciada para análise espacial no Pauliceia 2.0.</p><div className="badges">{selected.tags.map((t) => <span key={t}>{t}</span>)}</div></> : modal === "upload" ? <><p>Formatos aceitos: CSV.</p><div className="drop"><Upload/><b>Arraste seu arquivo aqui</b><span>ou clique para selecionar</span></div></> : <><p>Interação simulada para o protótipo navegável.</p><label className="field"><span>E-mail</span><input placeholder="seu@email.com"/></label></>}<div className="dialog-actions"><Button variant="outline" onClick={() => setModal(null)}>Fechar</Button><Button onClick={() => { toast("Ação concluída"); setModal(null); }}>Confirmar</Button></div></Dialog.Content></Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+export default function App() {
+  const [page, setPageState] = useState<Page>(initialPage());
+  const [modal, setModal] = useState<ModalType>(null);
+  const [lang, setLang] = useState("PT");
+  const [toast, setToast] = useState("");
+  const [selected, setSelected] = useState<Layer | null>(null);
+  const go = (p: Page) => { setPageState(p); history.pushState(null, "", p === "login" ? "/portal/login" : p === "map" ? "/portal/explore" : "/portal/home"); };
+  const say = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
+  return <><main>{page === "login" && <LoginPage go={go} open={setModal} toast={say}/>} {page === "home" && <HomePage go={go} open={setModal} lang={lang} setLang={setLang}/>} {page === "map" && <MapPage go={go} open={setModal} lang={lang} setLang={setLang} toast={say} selectLayer={setSelected}/>}</main><Modal modal={modal} setModal={setModal} selected={selected} toast={say}/>{toast && <div className="toast">{toast}</div>}</>;
+}
