@@ -12,6 +12,7 @@ const html = String.raw`<!doctype html>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/main.css" />
     <script type="module" crossorigin src="/assets/main.js"></script>
   </head>
   <body><div id="root"></div></body>
@@ -29,6 +30,7 @@ export default defineConfig({
     },
   ],
   build: {
+    cssCodeSplit: false,
     rollupOptions: {
       input: "src/main.tsx",
       output: {
