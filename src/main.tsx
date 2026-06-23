@@ -15,6 +15,7 @@ import "./sidebar-width.css";
 import "./mobile-responsive.css";
 import "./mobile-right-drawer.css";
 import "./map-requested-refinements.css";
+import "./image-performance";
 import App from "./App";
 
 createRoot(document.getElementById("root") as HTMLElement).render(<React.StrictMode><App /></React.StrictMode>);
