@@ -8,6 +8,7 @@ import "./home.css";
 import "./map.css";
 import "./figma-overrides.css";
 import "./final-polish.css";
+import "./requested-adjustments.css";
 import App from "./App";
 
 createRoot(document.getElementById("root") as HTMLElement).render(<React.StrictMode><App /></React.StrictMode>);
